@@ -1,0 +1,12 @@
+#include "amber99sb-star-ildn-mut.ff/forcefield.itp"
+#include "hybrid.itp"
+#include "amber99sb-star-ildn-mut.ff/tip3p.itp"
+#ifdef POSRES_WATER
+[ position_restraints ]
+1    1       1000       1000       1000
+#endif
+#include "amber99sb-star-ildn-mut.ff/ions.itp"
+[ system ]
+PMX MODEL
+[ molecules ]
+Protein_chain_G 1
