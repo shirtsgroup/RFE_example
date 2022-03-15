@@ -42,12 +42,12 @@ cd EM
 
 gmx grompp -f $MDP/em.mdp -c ../solvate/ions.gro -p ../../input_data/hybrid.top -o min.tpr -maxwarn 1
 
-gmx mdrun -deffnm min$MUT
+gmx mdrun -deffnm min
 
 #Exit if files are not written properly
 if test ! -f "min.gro"; then
-	        echo "Error with EM step"
-		        exit 1
+	echo "Error with EM step"
+	exit 1
 fi
 
 sleep 10
@@ -68,8 +68,8 @@ gmx mdrun -deffnm nvt
 echo "Constant volume equilibration complete."
 #Exit if files are not written properly
 if test ! -f "nvt.gro"; then
-	        echo "Error with NVT step on Lambda $MUT"
-		        exit 1
+	echo "Error with NVT step on Lambda $MUT"
+	exit 1
 fi
 
 sleep 10
@@ -89,8 +89,8 @@ gmx mdrun -deffnm npt -ntmpi 2 -ntomp 8
 
 #Exit if files are not written properly
 if test ! -f "npt.gro"; then
-	        echo "Error with NPT step on Lambda $MUT"
-		        exit 1
+	echo "Error with NPT step on Lambda $MUT"
+	exit 1
 fi
 
 echo "Constant pressure equilibration complete."
