@@ -24,9 +24,9 @@ gmx editconf -f ../../input_data/hybrid.pdb -o box.gro -bt dodecahedron -d 1.0
 
 gmx solvate -cp box.gro -p ../../input_data/hybrid.top -o solv.gro -cs
 
-gmx grompp -f ions.mdp -c solv.gro -p ../../input_data/hybrid.top -o ions.tpr
+gmx grompp -f $MDP/ions.mdp -c solv.gro -p ../../input_data/hybrid.top -o ions.tpr -maxwarn 1
 
-gmx genion -s ions.tpr -o ions.gro -p ../../input_data/hybrid.top -pname NA -nname CL -neutral
+gmx genion -s ions.tpr -o ions.gro -p ../../input_data/hybrid.top -pname NA -nname CL -neutral -maxwarn 1
 
 cd $HOME
 
