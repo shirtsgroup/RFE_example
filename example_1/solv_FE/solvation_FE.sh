@@ -28,6 +28,14 @@ gmx grompp -f $MDP/ions.mdp -c solv.gro -p ../../input_data/hybrid.top -o ions.t
 
 gmx genion -s ions.tpr -o ions.gro -p ../../input_data/hybrid.top -pname NA -nname CL -neutral -maxwarn 1
 
+#Exit if files are not written properly
+if test ! -f "ions.gro"; then
+	echo "Error with box set-up step"
+	exit 1
+else
+	echo "Initial box set-up step complete"
+fi
+
 cd $HOME
 
 ##############################
@@ -48,6 +56,8 @@ gmx mdrun -deffnm min
 if test ! -f "min.gro"; then
 	echo "Error with EM step"
 	exit 1
+else
+	echo "Initial EM step complete"
 fi
 
 sleep 10
@@ -70,6 +80,8 @@ echo "Constant volume equilibration complete."
 if test ! -f "nvt.gro"; then
 	echo "Error with NVT step on Lambda $MUT"
 	exit 1
+else
+	echo "Initial NVT Equilibration step complete"
 fi
 
 sleep 10
@@ -91,6 +103,8 @@ gmx mdrun -deffnm npt -ntmpi 2 -ntomp 8
 if test ! -f "npt.gro"; then
 	echo "Error with NPT step on Lambda $MUT"
 	exit 1
+else
+	echo "Initial NPT equilibration complete"
 fi
 
 echo "Constant pressure equilibration complete."
@@ -118,8 +132,6 @@ do
 	##############################
 	# ENERGY MINIMIZATION STEEP  #
 	##############################
-	echo "Starting minimization for lambda = $LAMBDA..."
-
 	mkdir EM
 	cd EM
 
@@ -142,8 +154,6 @@ do
 	#####################
 	# NVT EQUILIBRATION #
 	#####################
-	echo "Starting constant volume equilibration..."
-
 	cd ../
 	mkdir NVT
 	cd NVT
@@ -154,7 +164,6 @@ do
 
 		gmx mdrun -deffnm nvt_$LAMBDA
 	fi
-	echo "Constant volume equilibration complete."
 
     	#Exit if files are not written properly
         if test ! -f "nvt_$LAMBDA.gro"; then
@@ -167,8 +176,6 @@ do
 	#####################
 	# NPT EQUILIBRATION #
 	#####################
-	echo "Starting constant pressure equilibration..."
-
 	cd ../
 	mkdir NPT
 	cd NPT
@@ -186,9 +193,14 @@ do
 		exit 1
 	fi
 
-	echo "Constant pressure equilibration complete."
-
 	cd $HOME
+	
+	#Verify Lambda step is complete
+	if test -f "EM/min_$LAMBAD.gro" and test -f "NVT/nvt_$LAMBDA.gro" and test -f "NPT/npt_$LAMBDA.gro"; then
+		echo "Lambda step $LAMBDA completed"
+	else
+		echo "Error on Lambda step $LAMBDA"
+	fi
 done
 
 ######################
@@ -211,6 +223,4 @@ do
 done
 
 mpirun -np 6 gmx_mpi mdrun -replex 100 -multidir Lambda_0 Lambda_1 Lambda_2 Lambda_3 Lambda_4 Lambda_5 -deffnm md -dhdl dhdl.xvg
-
-
 
